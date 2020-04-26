@@ -16,16 +16,28 @@ namespace HarderBosses {
 
         public void Load() {
             On.NecromancerSkullMountState.StartBeam += NecromancerSkullMountState_StartBeam;
+
             On.NecromancerCastArrowsState.CastArrows += NecromancerCastArrowsState_CastArrows;
+
             On.NecromancerShootingState.ShootCoroutine += NecromancerShootingState_ShootCoroutine;
             On.NecromancerShootingState.StateExit += NecromancerShootingState_StateExit;
+
             On.PoisonArrow.StartMovement += PoisonArrow_StartMovement;
             On.PoisonArrow.Update += PoisonArrow_Update;
             On.PoisonArrow.Explode += PoisonArrow_Explode;
         }
 
         public void Unload() {
+            On.NecromancerSkullMountState.StartBeam -= NecromancerSkullMountState_StartBeam;
 
+            On.NecromancerCastArrowsState.CastArrows -= NecromancerCastArrowsState_CastArrows;
+
+            On.NecromancerShootingState.ShootCoroutine -= NecromancerShootingState_ShootCoroutine;
+            On.NecromancerShootingState.StateExit -= NecromancerShootingState_StateExit;
+
+            On.PoisonArrow.StartMovement -= PoisonArrow_StartMovement;
+            On.PoisonArrow.Update -= PoisonArrow_Update;
+            On.PoisonArrow.Explode -= PoisonArrow_Explode;
         }
 
         void PoisonArrow_StartMovement(On.PoisonArrow.orig_StartMovement orig, PoisonArrow self, int smallShot) {
@@ -62,6 +74,8 @@ namespace HarderBosses {
             orig(self);
             self.GetComponent<SpriteRenderer>().color = Color.white;
             self.damageTypeImmunity = 0;
+            DynData<PoisonArrow> selfData = new DynData<PoisonArrow>(self);
+            selfData.Set("bounceAtWall", false);
         }
 
 
@@ -117,7 +131,7 @@ namespace HarderBosses {
                 case 1:
                     return new float[] { .7f, .7f, .7f, .7f, .7f };
                 case 2:
-                    return new float[] { .1f, .1f, .1f, .1f, .1f, .5f};
+                    return new float[] { .075f, .075f, .075f, .075f, .075f, .5f};
             }
             return null;
         } 
@@ -125,23 +139,37 @@ namespace HarderBosses {
         IEnumerator NecromancerCastArrowsState_CastArrows(On.NecromancerCastArrowsState.orig_CastArrows orig, NecromancerCastArrowsState self) {
             DynData<NecromancerCastArrowsState> selfData = new DynData<NecromancerCastArrowsState>(self);
             NecromancerBoss boss = selfData.Get<NecromancerBoss>("boss");
-            SkeloutonSpawner spawner = UnityEngine.Object.FindObjectOfType<SkeloutonSpawner>();
-            for (int i = 0; i < 5; i++) {
-                spawner.Spawn(Vector3.Lerp(boss.castingPosLeft.position, boss.castingPosRight.position, 0.25f * i));
-            }
+            try {
+                SkeloutonSpawner spawner = Resources.FindObjectsOfTypeAll<SkeloutonSpawner>()[0];
+                for (int i = 0; i < 5; i++) {
+                    Vector3 spawnPos = Vector3.Lerp(boss.castingPosLeft.position, boss.castingPosRight.position, 0.25f * i);
+                    if (Vector3.Distance(spawnPos, Manager<PlayerManager>.Instance.Player.transform.position) > 5)
+                        spawner.Spawn(spawnPos);
+                }
+            } catch (Exception e) {
+                Console.WriteLine("Exception while spawning skeloutons");
+                CourierLogger.LogDetailed(e, "HarderBosses");
 
-            for (int wavesDone = 0;  wavesDone < self.waveCount; wavesDone++) {
+            }
+            for (int wavesDone = 0; wavesDone < self.waveCount; wavesDone++) {
                 List<Transform> arrowPattern = (List<Transform>)CastArrowsStateGetRandomArrowPatternInfo.Invoke(self, new object[] { wavesDone });
                 int numProjectiles = arrowPattern.Count;
 
                 while (arrowPattern.Count > 0) {
-                    GameObject projectile = Manager<PoolManager>.Instance.GetObjectInstance(boss.arrowProjectilePrefab);
-                    projectile.transform.position = arrowPattern[0].position;
-                    projectile.GetComponent<PoisonArrow>().SetNecromancerRef(boss);
-                    projectile.GetComponent<PoisonArrow>().OverrideDir(Vector2.down);
-                    DynData<PoisonArrow> arrowData = new DynData<PoisonArrow>(projectile.GetComponent<PoisonArrow>());
-                    arrowData.Set("bounceAtWall", false);
-                    arrowPattern.RemoveAt(0);
+                    try {
+                        GameObject projectile = Manager<PoolManager>.Instance.GetObjectInstance(boss.arrowProjectilePrefab);
+                        projectile.transform.position = arrowPattern[0].position;
+                        projectile.GetComponent<PoisonArrow>().SetNecromancerRef(boss);
+                        projectile.GetComponent<PoisonArrow>().OverrideDir(Vector2.down);
+                        PoisonArrow arrow = projectile.GetComponent<PoisonArrow>();
+                        DynData<PoisonArrow> arrowData = new DynData<PoisonArrow>(arrow);
+                        arrow.GetComponent<SpriteRenderer>().color = Color.cyan;
+                        arrow.damageTypeImmunity = (EDamageType)255;
+                        arrowData.Set("bounceAtWall", false);
+                        arrowPattern.RemoveAt(0);
+                    } catch (Exception e) {
+                        CourierLogger.LogDetailed(e, "HarderBosses");
+                    }
                     yield return new WaitForSeconds(self.projectileCD);
                 }
 

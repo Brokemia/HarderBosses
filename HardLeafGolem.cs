@@ -18,7 +18,7 @@ namespace HarderBosses {
             On.LeafGolemBoss.Explode -= LeafGolemBoss_Explode;
             On.LeafGolemBoss.StopExploding -= LeafGolemBoss_StopExploding;
             On.LeafGolemBoss.Kill -= LeafGolemBoss_Kill;
-
+            
             On.LeafGolemThrowLeavesSpecialState.OnThrow -= ThrowLeavesSpecialStateReplace.LeafGolemThrowLeavesSpecialState_OnThrow;
             On.LeafGolemThrowLeavesSpecialState.StateExit -= ThrowLeavesSpecialStateReplace.LeafGolemThrowLeavesSpecialState_StateExit;
 
@@ -30,6 +30,12 @@ namespace HarderBosses {
             ThrowLeavesStateReplace stateReplace = self.gameObject.AddComponent<ThrowLeavesStateReplace>();
             On.LeafGolemThrowLeavesState.OnThrow += stateReplace.LeafGolemThrowLeavesState_OnThrow;
 
+            if(ThrowLeavesSpecialStateReplace.projectile_3 != null) {
+                UnityEngine.Object.Destroy(ThrowLeavesSpecialStateReplace.projectile_3.gameObject);
+                UnityEngine.Object.Destroy(ThrowLeavesSpecialStateReplace.projectile_4.gameObject);
+                ThrowLeavesSpecialStateReplace.projectile_3 = null;
+                ThrowLeavesSpecialStateReplace.projectile_4 = null;
+            }
             ThrowLeavesSpecialStateReplace.projectile_3 = UnityEngine.Object.Instantiate(self.leafProjectile).GetComponent<LeafGolemProjectile>();
             ThrowLeavesSpecialStateReplace.projectile_4 = UnityEngine.Object.Instantiate(self.leafProjectile).GetComponent<LeafGolemProjectile>();
             ThrowLeavesSpecialStateReplace.projectile_3.gameObject.SetActive(false);
