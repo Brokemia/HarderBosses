@@ -9,13 +9,26 @@ namespace HarderBosses {
     public class HardBambooCreek {
         TurtleManRangedSpawner spawner;
 
+        public bool Enabled;
+
+        public void Toggle() {
+            Enabled = !Enabled;
+            if (Enabled) {
+                Load();
+            } else {
+                Unload();
+            }
+            HardBossesModule.Instance.bambooCreekButton.UpdateStateText();
+        }
+
         public void Load() {
             On.SceneLoader.OnSceneLoaded += SceneLoader_OnSceneLoaded;
             On.ObjectSpawner.Start += ObjectSpawner_Start;
         }
 
         public void Unload() {
-
+            On.SceneLoader.OnSceneLoaded -= SceneLoader_OnSceneLoaded;
+            On.ObjectSpawner.Start -= ObjectSpawner_Start;
         }
 
         void ObjectSpawner_Start(On.ObjectSpawner.orig_Start orig, ObjectSpawner self) {

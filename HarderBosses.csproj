@@ -90,6 +90,8 @@
     <Compile Include="HardLeafGolem.cs" />
     <Compile Include="HardNecromancer.cs" />
     <Compile Include="HardBambooCreek.cs" />
+    <Compile Include="HardEmeraldGolem.cs" />
+    <Compile Include="EmeraldGolemBossArmExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

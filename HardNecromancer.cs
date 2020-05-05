@@ -14,6 +14,18 @@ namespace HarderBosses {
 
         bool specialArrows;
 
+        public bool Enabled;
+
+        public void Toggle() {
+            Enabled = !Enabled;
+            if (Enabled) {
+                Load();
+            } else {
+                Unload();
+            }
+            HardBossesModule.Instance.necromancerButton.UpdateStateText();
+        }
+
         public void Load() {
             On.NecromancerSkullMountState.StartBeam += NecromancerSkullMountState_StartBeam;
 
@@ -25,6 +37,8 @@ namespace HarderBosses {
             On.PoisonArrow.StartMovement += PoisonArrow_StartMovement;
             On.PoisonArrow.Update += PoisonArrow_Update;
             On.PoisonArrow.Explode += PoisonArrow_Explode;
+
+            On.NecromancerOutroCutscene.ExplosionCoroutine += NecromancerOutroCutscene_ExplosionCoroutine;
         }
 
         public void Unload() {
@@ -38,6 +52,17 @@ namespace HarderBosses {
             On.PoisonArrow.StartMovement -= PoisonArrow_StartMovement;
             On.PoisonArrow.Update -= PoisonArrow_Update;
             On.PoisonArrow.Explode -= PoisonArrow_Explode;
+
+            On.NecromancerOutroCutscene.ExplosionCoroutine -= NecromancerOutroCutscene_ExplosionCoroutine;
+        }
+
+        IEnumerator NecromancerOutroCutscene_ExplosionCoroutine(On.NecromancerOutroCutscene.orig_ExplosionCoroutine orig, NecromancerOutroCutscene self) {
+            // Left in to debug an error that happened once
+            // Error is missing, presumed problematic
+            Console.WriteLine(Manager<NecromancerFightManager>.Instance.bossExplosions != null);
+            Console.WriteLine(Manager<NecromancerFightManager>.Instance.skullMountExplosions != null);
+            Console.WriteLine(self.explosionSFX != null);
+            yield return orig(self);
         }
 
         void PoisonArrow_StartMovement(On.PoisonArrow.orig_StartMovement orig, PoisonArrow self, int smallShot) {

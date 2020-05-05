@@ -1,6 +1,18 @@
 ﻿using System;
 namespace HarderBosses {
     public class HardLeafGolem {
+        public bool Enabled;
+
+        public void Toggle() {
+            Enabled = !Enabled;
+            if (Enabled) {
+                Load();
+            } else {
+                Unload();
+            }
+            HardBossesModule.Instance.leafGolemButton.UpdateStateText();
+        }
+
         public void Load() {
             On.LeafGolemBoss.Start += LeafGolemBoss_Start;
             On.LeafGolemBoss.Explode += LeafGolemBoss_Explode;
