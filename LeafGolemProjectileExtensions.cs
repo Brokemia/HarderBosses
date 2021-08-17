@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
+using Mod.Courier.Helpers;
 using MonoMod.Utils;
 using UnityEngine;
 
@@ -8,14 +9,14 @@ namespace HarderBosses {
     public static class LeafGolemProjectileExtensions {
         public static MethodInfo RaiseOnReachedPositionInfo = typeof(LeafGolemProjectile).GetEvent("onReachedPosition", BindingFlags.Public | BindingFlags.Instance).GetRaiseMethod();
 
-        internal static void Raise<TEventArgs>(this object source, string eventName, TEventArgs eventArgs) where TEventArgs : EventArgs {
+        /*internal static void Raise<TEventArgs>(this object source, string eventName, TEventArgs eventArgs) where TEventArgs : EventArgs {
             var eventDelegate = (MulticastDelegate)source.GetType().GetField(eventName, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(source);
             if (eventDelegate != null) {
                 foreach (var handler in eventDelegate.GetInvocationList()) {
                     handler.Method.Invoke(handler.Target, new object[] { source });
                 }
             }
-        }
+        }*/
 
         public static void GoToQuadSineWave(this LeafGolemProjectile self, Vector3 position, float duration) {
             DynData<LeafGolemProjectile> selfData = new DynData<LeafGolemProjectile>(self);
@@ -37,7 +38,7 @@ namespace HarderBosses {
                 self.transform.position = new Vector3(x, y, self.transform.position.z);
                 yield return null;
             }
-            self.Raise("onReachedPosition", EventArgs.Empty);
+            self.Raise("onReachedPosition", EventArgs.Empty, new object[] { self });
         }
     }
 }

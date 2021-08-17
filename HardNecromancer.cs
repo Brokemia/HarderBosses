@@ -14,15 +14,10 @@ namespace HarderBosses {
 
         bool specialArrows;
 
-        public bool Enabled;
+        public bool Enabled => HardBossesModule.Save.hardNecromancer;
 
         public void Toggle() {
-            Enabled = !Enabled;
-            if (Enabled) {
-                Load();
-            } else {
-                Unload();
-            }
+            HardBossesModule.Save.hardNecromancer = !HardBossesModule.Save.hardNecromancer;
             HardBossesModule.Instance.necromancerButton.UpdateStateText();
         }
 
@@ -88,7 +83,8 @@ namespace HarderBosses {
                             selfData.Set("bounceAtWall", false);
                         }
                     } catch(Exception e) {
-                        CourierLogger.LogDetailed(e);
+                        selfData.Set("bounceAtWall", false);
+                        //CourierLogger.LogDetailed(e);
                     }
                 }
             }

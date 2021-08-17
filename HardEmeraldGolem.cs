@@ -10,15 +10,10 @@ namespace HarderBosses {
 
         Vector3 regularBeginPos;
 
-        public bool Enabled;
+        public bool Enabled => HardBossesModule.Save.hardEmeraldGolem;
 
         public void Toggle() {
-            Enabled = !Enabled;
-            if (Enabled) {
-                Load();
-            } else {
-                Unload();
-            }
+            HardBossesModule.Save.hardEmeraldGolem = !HardBossesModule.Save.hardEmeraldGolem;
             HardBossesModule.Instance.emeraldGolemButton.UpdateStateText();
         }
 
@@ -68,6 +63,7 @@ namespace HarderBosses {
 
 
         IEnumerator EmeraldGolemBoss_HeadVulnerabilityWindowCoroutine(On.EmeraldGolemBoss.orig_HeadVulnerabilityWindowCoroutine orig, EmeraldGolemBoss self) {
+            Console.WriteLine("better logging");
             DynData<EmeraldGolemBoss> selfData = emeraldBossData = new DynData<EmeraldGolemBoss>(self);
             if (selfData.Get<Coroutine>("shootCoroutine") != null) {
                 self.StopCoroutine(selfData.Get<Coroutine>("shootCoroutine"));
@@ -84,12 +80,13 @@ namespace HarderBosses {
             selfData.Set("headInvincible", false);
             yield return new WaitForSeconds(1f);
             // Shoot energy balls at the player
-            for (int i = 0; i < 25; i++) {
+            for (int i = 0; i < 35; i++) {
                 // Don't shoot if the player is above the golem
                 if (Manager<PlayerManager>.Instance.Player.transform.position.y < self.head.position.y) {
                     Manager<AudioManager>.Instance.PlaySoundEffect(self.headShootSFX);
                     WallShmuProjectile projectile = Manager<PoolManager>.Instance.GetObjectInstance(self.headProjectilePrefab).GetComponent<WallShmuProjectile>();
                     projectile.GetComponent<DisableNotifier>().onDisabled += OnProjectileDisabled;
+                    Console.WriteLine(projectile.transform.position);
                     selfData.Get<List<GameObject>>("projectileList").Add(projectile.gameObject);
                     projectile.transform.position = self.head.position;
                     Vector3 dir = Manager<PlayerManager>.Instance.Player.transform.position + new Vector3(0f, 2.7f, 0f) - self.head.position;
@@ -116,7 +113,7 @@ namespace HarderBosses {
             gemAnimator.SetTrigger("On");
             self.head.GetComponent<Animator>().SetTrigger("IdleOff");
             selfData.Set("headInvincible", true);
-            self.gemHP = self.gemMaxHP;
+            selfData.Set("gemHP", self.gemMaxHP);
             self.gem.invincibru = false;
             Manager<AudioManager>.Instance.PlaySoundEffect(self.activateSFX);
             self.stateMachine.SetState<EmeraldGolemStunnedDoneState>();
@@ -193,7 +190,7 @@ namespace HarderBosses {
 
         IEnumerator EmeraldGolemBossArm_StompCoroutine(On.EmeraldGolemBossArm.orig_StompCoroutine orig, EmeraldGolemBossArm self) {
             float oldDuration = self.followPlayerStompShakeDuration;
-            self.followPlayerStompShakeDuration = .85f;
+            self.followPlayerStompShakeDuration = .88f;
             yield return orig(self);
             self.followPlayerStompShakeDuration = oldDuration;
         }

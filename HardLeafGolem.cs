@@ -1,15 +1,13 @@
 ﻿using System;
+using MonoMod.Utils;
+
 namespace HarderBosses {
     public class HardLeafGolem {
-        public bool Enabled;
+
+        public bool Enabled => HardBossesModule.Save.hardLeafGolem;
 
         public void Toggle() {
-            Enabled = !Enabled;
-            if (Enabled) {
-                Load();
-            } else {
-                Unload();
-            }
+            HardBossesModule.Save.hardLeafGolem = !HardBossesModule.Save.hardLeafGolem;
             HardBossesModule.Instance.leafGolemButton.UpdateStateText();
         }
 
@@ -52,11 +50,13 @@ namespace HarderBosses {
             ThrowLeavesSpecialStateReplace.projectile_4 = UnityEngine.Object.Instantiate(self.leafProjectile).GetComponent<LeafGolemProjectile>();
             ThrowLeavesSpecialStateReplace.projectile_3.gameObject.SetActive(false);
             ThrowLeavesSpecialStateReplace.projectile_4.gameObject.SetActive(false);
-            self.stateMachine.GetState<LeafGolemThrowLeavesState>().delayBeforeLeafComeBack = 0.2f;
-            self.stateMachine.GetState<LeafGolemThrowLeavesState>().projectileSpeed += 16;
+            DynData<LeafGolemBoss> selfData = new DynData<LeafGolemBoss>(self);
+
+            selfData.Get<StateMachine>("stateMachine").GetState<LeafGolemThrowLeavesState>().delayBeforeLeafComeBack = 0.2f;
+            selfData.Get<StateMachine>("stateMachine").GetState<LeafGolemThrowLeavesState>().projectileSpeed += 16;
             // I already made it harder, no need to be much faster
-            self.stateMachine.GetState<LeafGolemThrowLeavesSpecialState>().projectileSpeed += 5;
-            self.stateMachine.GetState<LeafGolemMoveTowardsPlayerState>().moveSpeed *= 3;
+            selfData.Get<StateMachine>("stateMachine").GetState<LeafGolemThrowLeavesSpecialState>().projectileSpeed += 5;
+            selfData.Get<StateMachine>("stateMachine").GetState<LeafGolemMoveTowardsPlayerState>().moveSpeed *= 3;
         }
 
         void LeafGolemBoss_Explode(On.LeafGolemBoss.orig_Explode orig, LeafGolemBoss self) {

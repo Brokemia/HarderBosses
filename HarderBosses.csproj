@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HardBossesModule.cs" />
+    <Compile Include="HarderBossesSave.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThrowLeavesSpecialStateReplace.cs" />
     <Compile Include="ThrowLeavesStateReplace.cs" />
@@ -92,6 +93,8 @@
     <Compile Include="HardBambooCreek.cs" />
     <Compile Include="HardEmeraldGolem.cs" />
     <Compile Include="EmeraldGolemBossArmExtension.cs" />
+    <Compile Include="HardQoQ.cs" />
+    <Compile Include="HardColossuses.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

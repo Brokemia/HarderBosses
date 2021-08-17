@@ -9,15 +9,10 @@ namespace HarderBosses {
     public class HardBambooCreek {
         TurtleManRangedSpawner spawner;
 
-        public bool Enabled;
+        public bool Enabled => HardBossesModule.Save.hardBambooCreek;
 
         public void Toggle() {
-            Enabled = !Enabled;
-            if (Enabled) {
-                Load();
-            } else {
-                Unload();
-            }
+            HardBossesModule.Save.hardBambooCreek = !HardBossesModule.Save.hardBambooCreek;
             HardBossesModule.Instance.bambooCreekButton.UpdateStateText();
         }
 
